@@ -1,0 +1,111 @@
+/* app/globals.css */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  --bg: #0e0f1a;
+  --surface: #161728;
+  --surface2: #1e2038;
+  --border: rgba(255,255,255,0.07);
+  --amber: #f5a623;
+  --coral: #ff6b6b;
+  --mint: #4ecdc4;
+  --lavender: #a78bfa;
+  --text: #f0f0f5;
+  --muted: #7a7a9a;
+  --success: #22c55e;
+  --error: #ef4444;
+  --r: 14px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  font-family: inherit;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 24px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border-radius: var(--r);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--amber);
+  color: #0e0f1a;
+}
+
+.btn-primary:hover {
+  background: #ffc15e;
+  transform: translateY(-2px);
+}
+
+.option-btn {
+  width: 100%;
+  text-align: left;
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 18px;
+  color: var(--text);
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.option-btn:hover {
+  border-color: var(--amber);
+}
+
+.option-btn.correct {
+  border-color: var(--success);
+  background: rgba(34,197,94,0.1);
+}
+
+.option-btn.incorrect {
+  border-color: var(--error);
+  background: rgba(239,68,68,0.1);
+}
+
+.vocabulary-word {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  cursor: pointer;
+  position: relative;
+  color: var(--amber);
+}
+
+.vocabulary-translation {
+  position: absolute;
+  bottom: -25px;
+  left: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 10;
+}

@@ -1606,4 +1606,282 @@ After completing this test, you'll be ready for A2!`,
     vocab: [],
     isFinalTest: true
   }
-];
+];  // 👈 Кінець A1_TEMPLATES
+
+// ============================================
+// A2, B1, B2, C1 TEMPLATES (поки порожні)
+// ============================================
+const A2_TEMPLATES: Template[] = [];
+const B1_TEMPLATES: Template[] = [];
+const B2_TEMPLATES: Template[] = [];
+const C1_TEMPLATES: Template[] = [];
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+function vocabToItems(vocab: string[]): VocabularyItem[] {
+  return vocab.map((word) => ({
+    wordEN: word,
+    translations: {
+      uk: `[${word}_uk]`,
+      ru: `[${word}_ru]`,
+      es: `[${word}_es]`
+    }
+  }));
+}
+
+function explain(en: string, uk: string, ru: string, es: string): Record<string, string> {
+  return { en, uk, ru, es };
+}
+
+function mcq(
+  id: string,
+  questionEN: string,
+  options: string[],
+  correctIndex: number,
+  exp: Record<string, string>
+): Exercise {
+  return {
+    id,
+    type: 'multiple_choice',
+    questionEN,
+    options,
+    correct: correctIndex,
+    explanations: exp
+  };
+}
+
+function fillBlank(
+  id: string,
+  prompt: string,
+  correct: string,
+  exp: Record<string, string>
+): Exercise {
+  return {
+    id,
+    type: 'fill_blank',
+    questionEN: prompt,
+    correct,
+    explanations: exp
+  };
+}
+
+function sentenceOrder(
+  id: string,
+  prompt: string,
+  words: string[],
+  correctSentence: string,
+  exp: Record<string, string>
+): Exercise {
+  return {
+    id,
+    type: 'sentence_order',
+    questionEN: prompt,
+    words, // КРИТИЧНО: слова для складання
+    correct: correctSentence,
+    explanations: exp
+  };
+}
+
+// ============================================
+// BUILD EXERCISES - ТУТ ВСІ ВПРАВИ ДЛЯ УРОКІВ
+// ============================================
+function buildRegularExercises(grammarKey: string, lessonId: string): Exercise[] {
+  const ex: Exercise[] = [];
+
+  // ===== A1 LESSON 1: Be intro =====
+  if (grammarKey === 'A1_L1_BE_INTRO') {
+    ex.push(
+      mcq(`${lessonId}-e1`, 'Choose the correct form:', ['I am from Ukraine.', 'I is from Ukraine.', 'I are from Ukraine.', 'I be from Ukraine.'], 0,
+        explain('Use "am" with "I"', 'Використовуй "am" з "I"', 'Используй "am" с "I"', 'Usa "am" con "I"')),
+      mcq(`${lessonId}-e2`, 'Choose correct:', ['She is a teacher.', 'She am a teacher.', 'She are a teacher.', 'She be a teacher.'], 0,
+        explain('Use "is" with he/she/it', 'Використовуй "is" з he/she/it', 'Используй "is" с he/she/it', 'Usa "is" con he/she/it')),
+      fillBlank(`${lessonId}-e3`, 'Fill: They ___ students.', 'are',
+        explain('Use "are" with they/we/you', 'Використовуй "are" з they/we/you', 'Используй "are" с they/we/you', 'Usa "are" con they/we/you')),
+      mcq(`${lessonId}-e4`, 'What is the question form?', ['Are you a student?', 'You are a student?', 'Is you a student?', 'Am you a student?'], 0,
+        explain('Questions: Are + you', 'Питання: Are + you', 'Вопрос: Are + you', 'Pregunta: Are + you')),
+      sentenceOrder(`${lessonId}-e5`, 'Make a sentence:', ['Nice', 'to', 'meet', 'you'], 'Nice to meet you.',
+        explain('Common greeting', 'Звичайне вітання', 'Обычное приветствие', 'Saludo común')),
+      mcq(`${lessonId}-e6`, 'Negative form:', ['I am not tired.', 'I not am tired.', 'I amn\'t tired.', 'I no am tired.'], 0,
+        explain('Negative: am/is/are + not', 'Заперечення: am/is/are + not', 'Отрицание: am/is/are + not', 'Negativo: am/is/are + not')),
+      fillBlank(`${lessonId}-e7`, 'Fill: He ___ from Spain.', 'is',
+        explain('"He" uses "is"', '"He" використовує "is"', '"He" использует "is"', '"He" usa "is"')),
+      mcq(`${lessonId}-e8`, 'Choose correct:', ['We are friends.', 'We is friends.', 'We am friends.', 'We be friends.'], 0,
+        explain('"We" uses "are"', '"We" використовує "are"', '"We" использует "are"', '"We" usa "are"')),
+      sentenceOrder(`${lessonId}-e9`, 'Make a sentence:', ['My', 'name', 'is', 'Anna'], 'My name is Anna.',
+        explain('Introducing yourself', 'Представлення себе', 'Представление себя', 'Presentándose')),
+      fillBlank(`${lessonId}-e10`, 'Fill: You ___ welcome.', 'are',
+        explain('"You" uses "are"', '"You" використовує "are"', '"You" использует "are"', '"You" usa "are"'))
+    );
+    return ex;
+  }
+
+  // ===== A1 LESSON 2: Possessive =====
+  if (grammarKey === 'A1_L2_POSSESSIVE') {
+    ex.push(
+      mcq(`${lessonId}-e1`, 'Choose correct:', ['This is my book.', 'This is me book.', 'This is mine book.', 'This is I book.'], 0,
+        explain('"my" + noun', '"my" + іменник', '"my" + существительное', '"my" + sustantivo')),
+      mcq(`${lessonId}-e2`, 'Choose correct:', ['Her name is Anna.', 'Hers name is Anna.', 'She name is Anna.', 'The her name is Anna.'], 0,
+        explain('"her" before noun', '"her" перед іменником', '"her" перед существительным', '"her" antes del sustantivo')),
+      fillBlank(`${lessonId}-e3`, 'Fill: This is ___ (we) house.', 'our',
+        explain('we → our', 'we → our', 'we → our', 'we → our')),
+      mcq(`${lessonId}-e4`, 'Choose correct:', ['His car is new.', 'He car is new.', 'Him car is new.', 'Hes car is new.'], 0,
+        explain('"his" shows ownership', '"his" показує власність', '"his" показывает собственность', '"his" muestra posesión')),
+      sentenceOrder(`${lessonId}-e5`, 'Make a sentence:', ['Their', 'dog', 'is', 'big'], 'Their dog is big.',
+        explain('"their" + noun', '"their" + іменник', '"their" + существительное', '"their" + sustantivo')),
+      fillBlank(`${lessonId}-e6`, 'Fill: Is this ___ (you) phone?', 'your',
+        explain('you → your', 'you → your', 'you → your', 'you → your')),
+      mcq(`${lessonId}-e7`, 'Choose correct:', ['Our family is big.', 'We family is big.', 'Us family is big.', 'Ours family is big.'], 0,
+        explain('"our" before noun', '"our" перед іменником', '"our" перед существительным', '"our" antes del sustantivo')),
+      sentenceOrder(`${lessonId}-e8`, 'Make a sentence:', ['This', 'is', 'my', 'sister'], 'This is my sister.',
+        explain('Introducing family', 'Представлення сім\'ї', 'Представление семьи', 'Presentando familia')),
+      fillBlank(`${lessonId}-e9`, 'Fill: ___ (She) name is Maria.', 'Her',
+        explain('she → her', 'she → her', 'she → her', 'she → her')),
+      mcq(`${lessonId}-e10`, 'Choose correct:', ['That is your bag.', 'That is you bag.', 'That is yours bag.', 'That is the your bag.'], 0,
+        explain('"your" + noun', '"your" + іменник', '"your" + существительное', '"your" + sustantivo'))
+    );
+    return ex;
+  }
+
+  // ===== FALLBACK для інших A1 уроків =====
+  // (Для уроків 3-20 використовуємо універсальні вправи)
+  
+  ex.push(
+    mcq(`${lessonId}-e1`, 'Choose the best answer:', ['This is correct.', 'This are correct.', 'This be correct.', 'This being correct.'], 0,
+      explain('Correct grammar', 'Правильна граматика', 'Правильная грамматика', 'Gramática correcta')),
+    fillBlank(`${lessonId}-e2`, 'Fill: I ___ English.', 'study',
+      explain('Common verb', 'Поширене дієслово', 'Обычный глагол', 'Verbo común')),
+    mcq(`${lessonId}-e3`, 'Choose correct:', ['What do you do?', 'What you do?', 'What does you do?', 'What do you does?'], 0,
+      explain('Question form', 'Питальна форма', 'Вопросительная форма', 'Forma interrogativa')),
+    sentenceOrder(`${lessonId}-e4`, 'Make a sentence:', ['I', 'like', 'English'], 'I like English.',
+      explain('Natural order', 'Природний порядок', 'Естественный порядок', 'Orden natural')),
+    fillBlank(`${lessonId}-e5`, 'Fill: She ___ to school.', 'goes',
+      explain('Add -es for she/he/it', 'Додай -es для she/he/it', 'Добавь -es для she/he/it', 'Añade -es para she/he/it')),
+    mcq(`${lessonId}-e6`, 'Negative form:', ['I don\'t like it.', 'I no like it.', 'I not like it.', 'I doesn\'t like it.'], 0,
+      explain('don\'t + verb', 'don\'t + дієслово', 'don\'t + глагол', 'don\'t + verbo')),
+    sentenceOrder(`${lessonId}-e7`, 'Make a sentence:', ['They', 'are', 'happy'], 'They are happy.',
+      explain('Simple sentence', 'Просте речення', 'Простое предложение', 'Oración simple')),
+    fillBlank(`${lessonId}-e8`, 'Fill: We ___ in class.', 'are',
+      explain('We uses "are"', 'We використовує "are"', 'We использует "are"', 'We usa "are"')),
+    mcq(`${lessonId}-e9`, 'Choose correct:', ['He is tall.', 'He are tall.', 'He am tall.', 'He be tall.'], 0,
+      explain('He uses "is"', 'He використовує "is"', 'He использует "is"', 'He usa "is"')),
+    sentenceOrder(`${lessonId}-e10`, 'Make a sentence:', ['She', 'likes', 'music'], 'She likes music.',
+      explain('Add -s for she', 'Додай -s для she', 'Добавь -s для she', 'Añade -s para she'))
+  );
+
+  return ex;
+}
+
+// Функція генерації тестових вправ
+function buildTestExercises(lessonId: string, testType: 'review' | 'final'): Exercise[] {
+  const ex: Exercise[] = [];
+  const count = testType === 'final' ? 20 : 10;
+
+  for (let i = 0; i < count; i++) {
+    ex.push(
+      mcq(`${lessonId}-e${i + 1}`, `Test question ${i + 1}:`, 
+        ['Correct answer', 'Wrong answer 1', 'Wrong answer 2', 'Wrong answer 3'], 0,
+        explain('This tests your knowledge', 'Це перевіряє твої знання', 'Esto prueba tus conocimientos', 'Esto prueba tus conocimientos'))
+    );
+  }
+
+  return ex;
+}
+
+// Генерація уроку
+function generateLesson(level: CEFRLevel, lessonIndex: number, template: Template): Lesson {
+  const lessonId = `${level.toLowerCase()}-l${lessonIndex + 1}`;
+
+  let exercises: Exercise[];
+  let lessonType: Lesson['type'];
+  let xp: number;
+
+  if (template.isFinalTest) {
+    exercises = buildTestExercises(lessonId, 'final');
+    lessonType = 'final_test';
+    xp = XP_BASE[level] * 2;
+  } else if (template.isTest) {
+    exercises = buildTestExercises(lessonId, 'review');
+    lessonType = 'review';
+    xp = XP_BASE[level] * 1.5;
+  } else {
+    exercises = buildRegularExercises(template.grammarKey, lessonId);
+    lessonType = 'grammar';
+    xp = XP_BASE[level];
+  }
+
+  return {
+    id: lessonId,
+    titleEN: template.topic,
+    type: lessonType,
+    level,
+    xp,
+    storyEN: template.grammarExplanation,
+    exercises,
+    vocabulary: vocabToItems(template.vocab)
+  };
+}
+
+// ============================================
+// ГОЛОВНА ФУНКЦІЯ ГЕНЕРАЦІЇ CURRICULUM
+// ============================================
+export function generateCurriculum(): Record<CEFRLevel, LevelCurriculum> {
+  const levels: CEFRLevel[] = ['A1', 'A2', 'B1', 'B2', 'C1'];
+  const curriculum = {} as Record<CEFRLevel, LevelCurriculum>;
+
+  const allTemplates: Record<CEFRLevel, Template[]> = {
+    A1: A1_TEMPLATES,
+    A2: A2_TEMPLATES,
+    B1: B1_TEMPLATES,
+    B2: B2_TEMPLATES,
+    C1: C1_TEMPLATES
+  };
+
+  for (const level of levels) {
+    const templates = allTemplates[level] ?? [];
+    const lessons = templates.map((t, i) => generateLesson(level, i, t));
+
+    const lessonsPerUnit = 6;
+    const unitCount = Math.max(1, Math.ceil(lessons.length / lessonsPerUnit));
+    const units: Unit[] = [];
+
+    for (let i = 0; i < unitCount; i++) {
+      const slice = lessons.slice(i * lessonsPerUnit, (i + 1) * lessonsPerUnit);
+
+      units.push({
+        id: `${level.toLowerCase()}-u${i + 1}`,
+        titleEN: `${level} Unit ${i + 1}`,
+        icon: ICONS[i % ICONS.length],
+        lessons: slice
+      });
+    }
+
+    curriculum[level] = { level, units };
+  }
+
+  return curriculum;
+}
+
+export function generateLessonsByLevel(level: CEFRLevel, count: number = 25): Lesson[] {
+  const templates: Record<CEFRLevel, Template[]> = {
+    A1: A1_TEMPLATES,
+    A2: A2_TEMPLATES,
+    B1: B1_TEMPLATES,
+    B2: B2_TEMPLATES,
+    C1: C1_TEMPLATES
+  };
+  
+  const levelTemplates = (templates[level] ?? []).slice(0, count);
+  return levelTemplates.map((t, i) => generateLesson(level, i, t));
+}
+
+export function generateSingleLesson(level: CEFRLevel, topic: string, grammar: string, storyEN: string): Lesson {
+  const template: Template = {
+    topic,
+    grammarKey: 'A1_L1_BE_INTRO',
+    grammarExplanation: storyEN || `A short story about ${topic}.`,
+    vocab: [grammar, topic, 'example', 'practice', 'learn']
+  };
+
+  return generateLesson(level, 0, template);
+}

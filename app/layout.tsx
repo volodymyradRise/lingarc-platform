@@ -5,8 +5,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'LingArc - Learn English from A1 to C1',
-  description:
-    'Master English with adaptive learning, from beginner to advanced.',
+  description: 'Master English with adaptive learning, from beginner to advanced.',
 };
 
 export default function RootLayout({
@@ -17,33 +16,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {/* HEADER */}
-        <header
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '18px 28px',
-            borderBottom: '1px solid rgba(255,255,255,0.08)',
-            background: '#0b0f1a',
-          }}
-        >
-          {/* CLICKABLE LOGO */}
+        {/* GLOBAL HEADER */}
+        <header className="border-b border-white/10 px-6 py-4 flex justify-between items-center">
           <Link
             href="/"
-            style={{
-              fontSize: 24,
-              fontWeight: 700,
-              textDecoration: 'none',
-              color: 'white',
-              letterSpacing: 0.5,
-            }}
+            className="text-xl font-bold tracking-tight hover:opacity-80 transition"
           >
-            Ling<span style={{ color: '#f5a623' }}>Arc</span>
+            Ling<span className="text-yellow-400">Arc</span>
           </Link>
         </header>
 
-        {/* PAGE CONTENT */}
         <main>{children}</main>
       </body>
     </html>

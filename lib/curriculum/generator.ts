@@ -139,19 +139,7 @@ Numbers are everywhere: your age, phone number, address, prices!
 1-10: one, two, three, four, five, six, seven, eight, nine, ten
 11-12: eleven, twelve (special!)
 13-19: thirteen, fourteen, fifteen, sixteen, seventeen, eighteen, nineteen
-20: twenty
-
-**Decades:**
-20, 30, 40, 50, 60, 70, 80, 90, 100
-
-**Asking about age:**
-❓ "How old are you?" (Скільки тобі років?)
-✅ "I am 25 years old." or "I'm 25."
-
-**Asking "How...?" questions:**
-- How old...? (age)
-- How much...? (price)
-- How many...? (quantity)`,
+20: twenty`,
     vocab: ['one', 'two', 'three', 'ten', 'twenty', 'age', 'year', 'old', 'how', 'many']
   },
   {
@@ -163,9 +151,7 @@ Want to talk about your daily routine? You need **Present Simple**!
 
 **When do we use it?**
 ✅ Habits: "I drink coffee every morning"
-✅ Routines: "She goes to work at 8 AM"
-✅ Facts: "The sun rises in the east"
-✅ Schedules: "The train leaves at 9:00"`,
+✅ Routines: "She goes to work at 8 AM"`,
     vocab: ['work', 'study', 'live', 'wake up', 'sleep', 'eat', 'drink', 'go', 'come', 'every day']
   },
   {

@@ -1,5 +1,4 @@
 // app/[locale]/layout.tsx
-
 import Link from 'next/link';
 import { I18nProvider } from '@/lib/i18n/provider';
 import type { SupportedLanguage } from '@/lib/i18n/types';
@@ -18,9 +17,10 @@ export default function LocaleLayout({
   children: React.ReactNode;
   params: { locale: string };
 }) {
-  const locale = validLocales.includes(params.locale as SupportedLanguage)
-    ? (params.locale as SupportedLanguage)
-    : 'en';
+  const locale: SupportedLanguage =
+    validLocales.includes(params.locale as SupportedLanguage)
+      ? (params.locale as SupportedLanguage)
+      : 'en';
 
   return (
     <I18nProvider initialLanguage={locale}>
@@ -31,7 +31,6 @@ export default function LocaleLayout({
           color: 'var(--text)',
         }}
       >
-        {/* HEADER */}
         <nav
           style={{
             position: 'sticky',
@@ -46,9 +45,9 @@ export default function LocaleLayout({
             borderBottom: '1px solid var(--border)',
           }}
         >
-          {/* ✅ КЛІКАБЕЛЬНИЙ LOGO */}
+          {/* ✅ CLICKABLE LOGO → LESSON TREE */}
           <Link
-            href={`/${locale}`}
+            href={`/${locale}/dashboard`}
             style={{
               textDecoration: 'none',
               fontFamily: "'Fraunces', serif",

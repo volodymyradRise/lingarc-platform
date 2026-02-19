@@ -203,7 +203,19 @@ export default function LessonPage() {
           {/* Sentence Order */}
           {currentExercise.type === 'sentence_order' && (
             <div className="space-y-4">
-              {/* 👇 ПОКАЗУЄМО СЛОВА */}
+              {/* 🔴 DEBUG БЛОК */}
+              <div className="p-4 bg-red-600 text-white rounded-lg mb-4 font-mono text-sm">
+                <p className="font-bold mb-2">🔍 DEBUG INFO:</p>
+                <p>Exercise ID: <span className="font-bold">{currentExercise.id}</span></p>
+                <p>Type: <span className="font-bold">{currentExercise.type}</span></p>
+                <p>Has words: <span className="font-bold">{currentExercise.words ? 'YES ✅' : 'NO ❌'}</span></p>
+                <p>Words count: <span className="font-bold">{currentExercise.words?.length || 0}</span></p>
+                <p>Words array: <span className="font-bold">{JSON.stringify(currentExercise.words)}</span></p>
+                <p>Question: <span className="font-bold">{currentExercise.questionEN}</span></p>
+                <p>Correct answer: <span className="font-bold">{String(currentExercise.correct)}</span></p>
+              </div>
+
+              {/* БЛОК З СЛОВАМИ */}
               {currentExercise.words && currentExercise.words.length > 0 && (
                 <div className="mb-4 p-4 bg-gray-900 rounded-lg border border-gray-700">
                   <p className="text-sm text-gray-400 mb-3">💡 Words to use:</p>
@@ -220,6 +232,7 @@ export default function LessonPage() {
                 </div>
               )}
 
+              {/* TEXTAREA */}
               <textarea
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}

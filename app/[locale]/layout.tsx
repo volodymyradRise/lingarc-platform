@@ -17,10 +17,9 @@ export default function LocaleLayout({
   children: React.ReactNode;
   params: { locale: string };
 }) {
-  const locale: SupportedLanguage =
-    validLocales.includes(params.locale as SupportedLanguage)
-      ? (params.locale as SupportedLanguage)
-      : 'en';
+  const locale = validLocales.includes(params.locale as SupportedLanguage)
+    ? (params.locale as SupportedLanguage)
+    : 'en';
 
   return (
     <I18nProvider initialLanguage={locale}>
@@ -31,6 +30,7 @@ export default function LocaleLayout({
           color: 'var(--text)',
         }}
       >
+        {/* HEADER */}
         <nav
           style={{
             position: 'sticky',
@@ -45,15 +45,15 @@ export default function LocaleLayout({
             borderBottom: '1px solid var(--border)',
           }}
         >
-          {/* ✅ CLICKABLE LOGO → LESSON TREE */}
+          {/* ✅ Logo → TREE OF LESSONS */}
           <Link
             href={`/${locale}/dashboard`}
             style={{
-              textDecoration: 'none',
               fontFamily: "'Fraunces', serif",
               fontSize: 22,
               fontWeight: 700,
               color: 'var(--text)',
+              textDecoration: 'none',
             }}
           >
             Ling<span style={{ color: 'var(--amber)' }}>Arc</span>
@@ -62,7 +62,10 @@ export default function LocaleLayout({
           <LanguageSelector />
         </nav>
 
-        {children}
+        {/* ✅ CONTENT OFFSET (fix hiding) */}
+        <main style={{ paddingTop: 24 }}>
+          {children}
+        </main>
       </div>
     </I18nProvider>
   );

@@ -1,50 +1,65 @@
-// app/[locale]/lesson/[id]/page.tsx
 'use client';
 
-import { useState } from 'react';
-import { useI18n } from '@/lib/i18n/provider';
-import { CURRICULUM } from '@/lib/curriculum';
-import type { Lesson } from '@/lib/curriculum';
-import { getEffectiveLanguageForExplanation, shouldShowVocabularyHints } from '@/lib/i18n/fade-out';
-import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { generateCurriculum } from '@/lib/curriculum/generator';
+import type { Lesson, Exercise } from '@/lib/curriculum/generator';
+import ReactMarkdown from 'react-markdown';
 
-function findLesson(id: string): Lesson | null {
-  for (const levelData of Object.values(CURRICULUM)) {
-    for (const unit of levelData.units) {
-      const lesson = unit.lessons.find(l => l.id === id);
-      if (lesson) return lesson;
-    }
-  }
-  return null;
-}
+export default function LessonPage() {
+  const params = useParams();
+  const router = useRouter();
+  const lessonId = params.id as string;
 
-export default function LessonPage({ params }: { params: { id: string } }) {
-  const { t, language, userLevel, showExplanations } = useI18n();
-  const [phase, setPhase] = useState<'story' | 'exercise' | 'complete'>('story');
-  const [currentExerciseIdx, setCurrentExerciseIdx] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [lesson, setLesson] = useState<Lesson | null>(null);
+  const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
   const [userInput, setUserInput] = useState('');
-  const [showFeedback, setShowFeedback] = useState(false);
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
-  const [showVocabTranslations, setShowVocabTranslations] = useState(false);
 
-  const lesson = findLesson(params.id);
-  if (!lesson) return <div>Lesson not found</div>;
+  useEffect(() => {
+    const curriculum = generateCurriculum();
+    let foundLesson: Lesson | null = null;
 
-  const currentExercise = lesson.exercises[currentExerciseIdx];
-  const canShowVocab = shouldShowVocabularyHints(userLevel);
-  const explanationLang = getEffectiveLanguageForExplanation(language, userLevel);
+    for (const level of Object.values(curriculum)) {
+      for (const unit of level.units) {
+        const found = unit.lessons.find((l) => l.id === lessonId);
+        if (found) {
+          foundLesson = found;
+          break;
+        }
+      }
+      if (foundLesson) break;
+    }
+
+    setLesson(foundLesson);
+  }, [lessonId]);
+
+  if (!lesson) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-yellow-500 mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading lesson...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const currentExercise = lesson.exercises[currentExerciseIndex];
+  const progress = ((currentExerciseIndex + 1) / lesson.exercises.length) * 100;
 
   const handleMultipleChoice = (answerIdx: number) => {
     setSelectedAnswer(answerIdx);
-    setShowFeedback(true);
+    setShowResult(true);
     if (answerIdx === currentExercise.correct) {
       setScore(score + 1);
     }
   };
 
   const handleFillBlank = () => {
-    setShowFeedback(true);
+    setShowResult(true);
     const isCorrect = userInput.trim().toLowerCase() === String(currentExercise.correct).toLowerCase();
     if (isCorrect) {
       setScore(score + 1);
@@ -52,7 +67,7 @@ export default function LessonPage({ params }: { params: { id: string } }) {
   };
 
   const handleSentenceOrder = () => {
-    setShowFeedback(true);
+    setShowResult(true);
     const isCorrect = userInput.trim().toLowerCase() === String(currentExercise.correct).toLowerCase();
     if (isCorrect) {
       setScore(score + 1);
@@ -69,351 +84,212 @@ export default function LessonPage({ params }: { params: { id: string } }) {
     return false;
   };
 
-  const nextExercise = () => {
-    if (currentExerciseIdx < lesson.exercises.length - 1) {
-      setCurrentExerciseIdx(currentExerciseIdx + 1);
-      setSelectedAnswer(null);
+  const handleNext = () => {
+    if (currentExerciseIndex < lesson.exercises.length - 1) {
+      setCurrentExerciseIndex(currentExerciseIndex + 1);
       setUserInput('');
-      setShowFeedback(false);
+      setSelectedAnswer(null);
+      setShowResult(false);
     } else {
-      setPhase('complete');
+      router.push(`/${params.locale}/learn`);
     }
   };
 
-  if (phase === 'story') {
-    return (
-      <div style={{ maxWidth: 640, margin: '0 auto', padding: '40px 24px' }}>
-        <Link href="/dashboard" className="btn" style={{
-          background: 'var(--surface2)',
-          border: '1px solid var(--border)',
-          marginBottom: 24,
-          display: 'inline-flex'
-        }}>
-          ← {t('lesson.back')}
-        </Link>
-
-        <h1 style={{
-          fontFamily: "'Fraunces', serif",
-          fontSize: 32,
-          fontWeight: 700,
-          marginBottom: 8
-        }}>
-          {lesson.titleEN}
-        </h1>
-
-        <div className="card" style={{
-          marginBottom: 32,
-          background: 'linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%)',
-          borderColor: 'var(--amber)'
-        }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 16
-          }}>
-            <div style={{
-              fontSize: 13,
-              color: 'var(--amber)',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: 1
-            }}>
-              📖 {t('lesson.context')}
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
+      {/* Header */}
+      <div className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm sticky top-0 z-10">
+        <div className="max-w-4xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between mb-2">
+            <button
+              onClick={() => router.push(`/${params.locale}/learn`)}
+              className="text-gray-400 hover:text-white transition-colors"
+            >
+              ← Back
+            </button>
+            <h1 className="text-xl font-bold">{lesson.titleEN}</h1>
+            <div className="text-sm text-gray-400">
+              {currentExerciseIndex + 1}/{lesson.exercises.length}
             </div>
+          </div>
+          <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-yellow-500 to-pink-500 transition-all duration-300"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+      </div>
 
-            {canShowVocab && language !== 'en' && (
-              <button
-                onClick={() => setShowVocabTranslations(!showVocabTranslations)}
-                style={{
-                  padding: '6px 12px',
-                  background: 'var(--surface2)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 6,
-                  color: 'var(--text)',
-                  fontSize: 12,
-                  cursor: 'pointer'
-                }}
-              >
-                🔤 {showVocabTranslations ? t('lesson.hideVocab') : t('lesson.showVocab')}
-              </button>
-            )}
+      {/* Main Content */}
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        {/* Story/Grammar Explanation */}
+        {currentExerciseIndex === 0 && lesson.storyEN && (
+          <div className="mb-8 p-6 bg-gray-800/50 rounded-lg border border-gray-700">
+            <div className="prose prose-invert prose-sm max-w-none">
+              <ReactMarkdown>{lesson.storyEN}</ReactMarkdown>
+            </div>
+          </div>
+        )}
+
+        {/* Exercise Card */}
+        <div className="bg-gray-800 rounded-lg p-8 shadow-xl border border-gray-700">
+          {/* Question */}
+          <div className="mb-6">
+            <p className="text-2xl font-semibold mb-2">{currentExercise.questionEN}</p>
           </div>
 
-          <p style={{ lineHeight: 1.85, fontSize: 16, fontStyle: 'italic', marginBottom: showVocabTranslations ? 20 : 0 }}>
-            {lesson.storyEN}
-          </p>
+          {/* Multiple Choice */}
+          {currentExercise.type === 'multiple_choice' && currentExercise.options && (
+            <div className="space-y-3">
+              {currentExercise.options.map((option, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => !showResult && handleMultipleChoice(idx)}
+                  disabled={showResult}
+                  className={`w-full p-4 rounded-lg text-left font-medium transition-all ${
+                    showResult
+                      ? idx === currentExercise.correct
+                        ? 'bg-green-600 text-white'
+                        : idx === selectedAnswer
+                        ? 'bg-red-600 text-white'
+                        : 'bg-gray-700 text-gray-400'
+                      : 'bg-gray-700 hover:bg-gray-600 text-white'
+                  }`}
+                >
+                  <span className="mr-3 inline-block w-8 h-8 bg-gray-600 rounded-full text-center leading-8">
+                    {String.fromCharCode(65 + idx)}
+                  </span>
+                  {option}
+                </button>
+              ))}
+            </div>
+          )}
 
-          {showVocabTranslations && canShowVocab && language !== 'en' && (
-            <div style={{
-              paddingTop: 20,
-              borderTop: '1px solid var(--border)'
-            }}>
-              <div style={{
-                fontSize: 12,
-                color: 'var(--muted)',
-                marginBottom: 12,
-                fontWeight: 600
-              }}>
-                📚 {t('lesson.vocabularyHelp')}
-              </div>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: 8
-              }}>
-                {lesson.vocabulary.map((item, idx) => (
-                  <div key={idx} style={{ fontSize: 13, color: 'var(--muted)' }}>
-                    <span style={{ color: 'var(--text)', fontWeight: 500 }}>
-                      {item.wordEN}
-                    </span>
-                    {' → '}
-                    <span>{item.translations[language]}</span>
+          {/* Fill in the Blank */}
+          {currentExercise.type === 'fill_blank' && (
+            <div className="space-y-4">
+              <input
+                type="text"
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (!showResult) handleFillBlank();
+                  }
+                }}
+                disabled={showResult}
+                className={`w-full p-4 bg-gray-900 border-2 rounded-lg text-white text-lg ${
+                  showResult
+                    ? isCorrect()
+                      ? 'border-green-500'
+                      : 'border-red-500'
+                    : 'border-gray-700 focus:border-yellow-500'
+                } focus:outline-none transition-colors`}
+                placeholder="Type your answer..."
+              />
+              {!showResult && (
+                <button
+                  onClick={handleFillBlank}
+                  className="w-full py-3 bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded-lg transition-colors"
+                >
+                  Check Answer
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Sentence Order */}
+          {currentExercise.type === 'sentence_order' && (
+            <div className="space-y-4">
+              {/* 👇 ПОКАЗУЄМО СЛОВА */}
+              {currentExercise.words && currentExercise.words.length > 0 && (
+                <div className="mb-4 p-4 bg-gray-900 rounded-lg border border-gray-700">
+                  <p className="text-sm text-gray-400 mb-3">💡 Words to use:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {currentExercise.words.map((word, idx) => (
+                      <span
+                        key={idx}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium shadow-lg"
+                      >
+                        {word}
+                      </span>
+                    ))}
                   </div>
-                ))}
+                </div>
+              )}
+
+              <textarea
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (!showResult) handleSentenceOrder();
+                  }
+                }}
+                disabled={showResult}
+                className={`w-full p-4 bg-gray-900 border-2 rounded-lg text-white text-lg min-h-[120px] ${
+                  showResult
+                    ? isCorrect()
+                      ? 'border-green-500'
+                      : 'border-red-500'
+                    : 'border-gray-700 focus:border-yellow-500'
+                } focus:outline-none transition-colors resize-none`}
+                placeholder="Type the complete sentence..."
+              />
+              {!showResult && (
+                <button
+                  onClick={handleSentenceOrder}
+                  className="w-full py-3 bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded-lg transition-colors"
+                >
+                  Check Answer
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Result Feedback */}
+          {showResult && (
+            <div className="mt-6 space-y-4">
+              <div
+                className={`p-4 rounded-lg ${
+                  isCorrect()
+                    ? 'bg-green-900/30 border border-green-500'
+                    : 'bg-red-900/30 border border-red-500'
+                }`}
+              >
+                <p className="font-bold text-lg mb-2">
+                  {isCorrect() ? '✅ Correct!' : '❌ Not quite!'}
+                </p>
+                {!isCorrect() && (
+                  <p className="text-gray-300">
+                    Correct answer: <span className="font-bold text-white">{String(currentExercise.correct)}</span>
+                  </p>
+                )}
+                <p className="text-sm text-gray-300 mt-2">
+                  {currentExercise.explanations.en || 'Keep practicing!'}
+                </p>
               </div>
+
+              <button
+                onClick={handleNext}
+                className="w-full py-3 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-black font-bold rounded-lg transition-all shadow-lg"
+              >
+                {currentExerciseIndex < lesson.exercises.length - 1 ? 'Next Question →' : 'Complete Lesson 🎉'}
+              </button>
             </div>
           )}
         </div>
 
-        <button
-          onClick={() => setPhase('exercise')}
-          className="btn btn-primary"
-          style={{ width: '100%', fontSize: 17, padding: '18px 40px' }}
-        >
-          {t('lesson.startExercises')} →
-        </button>
-      </div>
-    );
-  }
-
-  if (phase === 'exercise') {
-    return (
-      <div style={{ maxWidth: 640, margin: '0 auto', padding: '40px 24px', paddingBottom: showFeedback ? 140 : 40 }}>
-        <div style={{ marginBottom: 32 }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            marginBottom: 8,
-            fontSize: 13,
-            color: 'var(--muted)'
-          }}>
-            <span>{lesson.titleEN}</span>
-            <span>{currentExerciseIdx + 1}/{lesson.exercises.length}</span>
-          </div>
-          <div style={{ width: '100%', height: 8, background: 'var(--surface2)', borderRadius: 99 }}>
-            <div style={{
-              height: '100%',
-              width: `${((currentExerciseIdx + 1) / lesson.exercises.length) * 100}%`,
-              background: 'linear-gradient(90deg, var(--amber), var(--coral))',
-              borderRadius: 99,
-              transition: 'width 0.3s'
-            }} />
-          </div>
-        </div>
-
-        <div style={{
-          padding: '12px 16px',
-          background: 'var(--surface2)',
-          borderRadius: 8,
-          marginBottom: 24,
-          fontSize: 14,
-          color: 'var(--muted)'
-        }}>
-          💡 {t('instructions.multipleChoice')}
-        </div>
-
-        <h2 style={{
-          fontSize: 22,
-          fontWeight: 600,
-          marginBottom: 32,
-          lineHeight: 1.4
-        }}>
-          {currentExercise.questionEN}
-        </h2>
-
-        {/* MULTIPLE CHOICE */}
-        {currentExercise.type === 'multiple_choice' && currentExercise.options && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {currentExercise.options.map((option, idx) => (
-              <button
-                key={idx}
-                onClick={() => !showFeedback && handleMultipleChoice(idx)}
-                disabled={showFeedback}
-                className={`option-btn ${showFeedback ? (idx === currentExercise.correct ? 'correct' : idx === selectedAnswer ? 'incorrect' : '') : ''}`}
-              >
-                <span style={{
-                  display: 'inline-flex',
-                  width: 28,
-                  height: 28,
-                  background: 'var(--bg)',
-                  borderRadius: '50%',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 12,
-                  fontWeight: 700,
-                  marginRight: 12
-                }}>
-                  {String.fromCharCode(65 + idx)}
-                </span>
-                {option}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* FILL IN THE BLANK */}
-        {currentExercise.type === 'fill_blank' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <input
-              type="text"
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              disabled={showFeedback}
-              placeholder="Type your answer here..."
-              style={{
-                width: '100%',
-                padding: '16px 20px',
-                background: 'var(--surface2)',
-                border: `2px solid ${showFeedback ? (isCorrect() ? 'var(--success)' : 'var(--error)') : 'var(--border)'}`,
-                borderRadius: 8,
-                color: 'var(--text)',
-                fontSize: 16,
-                fontFamily: 'inherit'
-              }}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter' && !showFeedback && userInput.trim()) {
-                  handleFillBlank();
-                }
-              }}
-            />
-            {!showFeedback && (
-              <button
-                onClick={handleFillBlank}
-                disabled={!userInput.trim()}
-                className="btn btn-primary"
-                style={{ alignSelf: 'flex-end' }}
-              >
-                Check Answer
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* SENTENCE ORDER */}
-        {currentExercise.type === 'sentence_order' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <textarea
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              disabled={showFeedback}
-              placeholder="Type the complete sentence..."
-              rows={3}
-              style={{
-                width: '100%',
-                padding: '16px 20px',
-                background: 'var(--surface2)',
-                border: `2px solid ${showFeedback ? (isCorrect() ? 'var(--success)' : 'var(--error)') : 'var(--border)'}`,
-                borderRadius: 8,
-                color: 'var(--text)',
-                fontSize: 16,
-                fontFamily: 'inherit',
-                resize: 'vertical'
-              }}
-            />
-            {!showFeedback && (
-              <button
-                onClick={handleSentenceOrder}
-                disabled={!userInput.trim()}
-                className="btn btn-primary"
-                style={{ alignSelf: 'flex-end' }}
-              >
-                Check Answer
-              </button>
-            )}
-          </div>
-        )}
-
-        {showFeedback && showExplanations && (
-          <div style={{
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            padding: '20px 32px',
-            background: isCorrect() ? '#166534' : '#7f1d1d',
-            borderTop: `3px solid ${isCorrect() ? 'var(--success)' : 'var(--error)'}`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            zIndex: 100
-          }}>
-            <div>
-              <div style={{ fontWeight: 700, fontSize: 17, marginBottom: 4 }}>
-                {isCorrect() ? t('lesson.correct') : t('lesson.incorrect')}
-              </div>
-              <div style={{ fontSize: 14, opacity: 0.85 }}>
-                {explanationLang === 'mixed'
-                  ? currentExercise.explanations[currentExerciseIdx % 2 === 0 ? language : 'en']
-                  : currentExercise.explanations[explanationLang]
-                }
-              </div>
-              {!isCorrect() && (
-                <div style={{ fontSize: 13, marginTop: 8, opacity: 0.7 }}>
-                  Correct answer: <strong>{String(currentExercise.correct)}</strong>
-                </div>
-              )}
-            </div>
-            <button onClick={nextExercise} className="btn btn-primary">
-              {currentExerciseIdx < lesson.exercises.length - 1 ? t('lesson.next') : t('lesson.finish')} →
-            </button>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  const accuracy = Math.round((score / lesson.exercises.length) * 100);
-
-  return (
-    <div style={{ maxWidth: 560, margin: '0 auto', padding: '60px 24px', textAlign: 'center' }}>
-      <div style={{ fontSize: 80, marginBottom: 24 }}>
-        {accuracy === 100 ? '🏆' : '✅'}
-      </div>
-      <h1 style={{
-        fontFamily: "'Fraunces', serif",
-        fontSize: 36,
-        fontWeight: 700,
-        marginBottom: 8
-      }}>
-        {accuracy === 100 ? t('lesson.perfect') : t('lesson.lessonComplete')}
-      </h1>
-      <p style={{ color: 'var(--muted)', marginBottom: 40 }}>
-        {score}/{lesson.exercises.length} {t('lesson.correctAnswers')}
-      </p>
-
-      <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginBottom: 40 }}>
-        <div className="card" style={{ textAlign: 'center', minWidth: 120 }}>
-          <div style={{ fontSize: 28, fontWeight: 900, color: 'var(--amber)' }}>
-            +{lesson.xp}
-          </div>
-          <div style={{ fontSize: 13, color: 'var(--muted)' }}>
-            {t('lesson.xpEarned')}
-          </div>
-        </div>
-        <div className="card" style={{ textAlign: 'center', minWidth: 120 }}>
-          <div style={{ fontSize: 28, fontWeight: 900, color: 'var(--mint)' }}>
-            {accuracy}%
-          </div>
-          <div style={{ fontSize: 13, color: 'var(--muted)' }}>
-            {t('lesson.accuracy')}
-          </div>
+        {/* Score */}
+        <div className="mt-6 text-center text-gray-400">
+          <p className="text-sm">
+            Score: <span className="text-yellow-500 font-bold">{score}</span> / {currentExerciseIndex + 1}
+          </p>
         </div>
       </div>
-
-      <Link href="/dashboard" className="btn btn-primary" style={{ width: '100%', fontSize: 17, padding: '18px 40px' }}>
-        {t('lesson.continueJourney')} →
-      </Link>
     </div>
   );
 }

@@ -23,6 +23,7 @@ export default function LessonPage({ params }: { params: { id: string } }) {
   const [phase, setPhase] = useState<'story' | 'exercise' | 'complete'>('story');
   const [currentExerciseIdx, setCurrentExerciseIdx] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [userInput, setUserInput] = useState('');
   const [showFeedback, setShowFeedback] = useState(false);
   const [score, setScore] = useState(0);
   const [showVocabTranslations, setShowVocabTranslations] = useState(false);
@@ -34,7 +35,7 @@ export default function LessonPage({ params }: { params: { id: string } }) {
   const canShowVocab = shouldShowVocabularyHints(userLevel);
   const explanationLang = getEffectiveLanguageForExplanation(language, userLevel);
 
-  const handleAnswer = (answerIdx: number) => {
+  const handleMultipleChoice = (answerIdx: number) => {
     setSelectedAnswer(answerIdx);
     setShowFeedback(true);
     if (answerIdx === currentExercise.correct) {
@@ -42,10 +43,37 @@ export default function LessonPage({ params }: { params: { id: string } }) {
     }
   };
 
+  const handleFillBlank = () => {
+    setShowFeedback(true);
+    const isCorrect = userInput.trim().toLowerCase() === String(currentExercise.correct).toLowerCase();
+    if (isCorrect) {
+      setScore(score + 1);
+    }
+  };
+
+  const handleSentenceOrder = () => {
+    setShowFeedback(true);
+    const isCorrect = userInput.trim().toLowerCase() === String(currentExercise.correct).toLowerCase();
+    if (isCorrect) {
+      setScore(score + 1);
+    }
+  };
+
+  const isCorrect = () => {
+    if (currentExercise.type === 'multiple_choice') {
+      return selectedAnswer === currentExercise.correct;
+    }
+    if (currentExercise.type === 'fill_blank' || currentExercise.type === 'sentence_order') {
+      return userInput.trim().toLowerCase() === String(currentExercise.correct).toLowerCase();
+    }
+    return false;
+  };
+
   const nextExercise = () => {
     if (currentExerciseIdx < lesson.exercises.length - 1) {
       setCurrentExerciseIdx(currentExerciseIdx + 1);
       setSelectedAnswer(null);
+      setUserInput('');
       setShowFeedback(false);
     } else {
       setPhase('complete');
@@ -204,32 +232,107 @@ export default function LessonPage({ params }: { params: { id: string } }) {
           {currentExercise.questionEN}
         </h2>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {currentExercise.options?.map((option, idx) => (
-            <button
-              key={idx}
-              onClick={() => !showFeedback && handleAnswer(idx)}
+        {/* MULTIPLE CHOICE */}
+        {currentExercise.type === 'multiple_choice' && currentExercise.options && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {currentExercise.options.map((option, idx) => (
+              <button
+                key={idx}
+                onClick={() => !showFeedback && handleMultipleChoice(idx)}
+                disabled={showFeedback}
+                className={`option-btn ${showFeedback ? (idx === currentExercise.correct ? 'correct' : idx === selectedAnswer ? 'incorrect' : '') : ''}`}
+              >
+                <span style={{
+                  display: 'inline-flex',
+                  width: 28,
+                  height: 28,
+                  background: 'var(--bg)',
+                  borderRadius: '50%',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  marginRight: 12
+                }}>
+                  {String.fromCharCode(65 + idx)}
+                </span>
+                {option}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* FILL IN THE BLANK */}
+        {currentExercise.type === 'fill_blank' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <input
+              type="text"
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
               disabled={showFeedback}
-              className={`option-btn ${showFeedback ? (idx === currentExercise.correct ? 'correct' : idx === selectedAnswer ? 'incorrect' : '') : ''}`}
-            >
-              <span style={{
-                display: 'inline-flex',
-                width: 28,
-                height: 28,
-                background: 'var(--bg)',
-                borderRadius: '50%',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 12,
-                fontWeight: 700,
-                marginRight: 12
-              }}>
-                {String.fromCharCode(65 + idx)}
-              </span>
-              {option}
-            </button>
-          ))}
-        </div>
+              placeholder="Type your answer here..."
+              style={{
+                width: '100%',
+                padding: '16px 20px',
+                background: 'var(--surface2)',
+                border: `2px solid ${showFeedback ? (isCorrect() ? 'var(--success)' : 'var(--error)') : 'var(--border)'}`,
+                borderRadius: 8,
+                color: 'var(--text)',
+                fontSize: 16,
+                fontFamily: 'inherit'
+              }}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter' && !showFeedback && userInput.trim()) {
+                  handleFillBlank();
+                }
+              }}
+            />
+            {!showFeedback && (
+              <button
+                onClick={handleFillBlank}
+                disabled={!userInput.trim()}
+                className="btn btn-primary"
+                style={{ alignSelf: 'flex-end' }}
+              >
+                Check Answer
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* SENTENCE ORDER */}
+        {currentExercise.type === 'sentence_order' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <textarea
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
+              disabled={showFeedback}
+              placeholder="Type the complete sentence..."
+              rows={3}
+              style={{
+                width: '100%',
+                padding: '16px 20px',
+                background: 'var(--surface2)',
+                border: `2px solid ${showFeedback ? (isCorrect() ? 'var(--success)' : 'var(--error)') : 'var(--border)'}`,
+                borderRadius: 8,
+                color: 'var(--text)',
+                fontSize: 16,
+                fontFamily: 'inherit',
+                resize: 'vertical'
+              }}
+            />
+            {!showFeedback && (
+              <button
+                onClick={handleSentenceOrder}
+                disabled={!userInput.trim()}
+                className="btn btn-primary"
+                style={{ alignSelf: 'flex-end' }}
+              >
+                Check Answer
+              </button>
+            )}
+          </div>
+        )}
 
         {showFeedback && showExplanations && (
           <div style={{
@@ -238,8 +341,8 @@ export default function LessonPage({ params }: { params: { id: string } }) {
             left: 0,
             right: 0,
             padding: '20px 32px',
-            background: selectedAnswer === currentExercise.correct ? '#166534' : '#7f1d1d',
-            borderTop: `3px solid ${selectedAnswer === currentExercise.correct ? 'var(--success)' : 'var(--error)'}`,
+            background: isCorrect() ? '#166534' : '#7f1d1d',
+            borderTop: `3px solid ${isCorrect() ? 'var(--success)' : 'var(--error)'}`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -247,7 +350,7 @@ export default function LessonPage({ params }: { params: { id: string } }) {
           }}>
             <div>
               <div style={{ fontWeight: 700, fontSize: 17, marginBottom: 4 }}>
-                {selectedAnswer === currentExercise.correct ? t('lesson.correct') : t('lesson.incorrect')}
+                {isCorrect() ? t('lesson.correct') : t('lesson.incorrect')}
               </div>
               <div style={{ fontSize: 14, opacity: 0.85 }}>
                 {explanationLang === 'mixed'
@@ -255,6 +358,11 @@ export default function LessonPage({ params }: { params: { id: string } }) {
                   : currentExercise.explanations[explanationLang]
                 }
               </div>
+              {!isCorrect() && (
+                <div style={{ fontSize: 13, marginTop: 8, opacity: 0.7 }}>
+                  Correct answer: <strong>{String(currentExercise.correct)}</strong>
+                </div>
+              )}
             </div>
             <button onClick={nextExercise} className="btn btn-primary">
               {currentExerciseIdx < lesson.exercises.length - 1 ? t('lesson.next') : t('lesson.finish')} →

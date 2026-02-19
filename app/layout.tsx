@@ -4,7 +4,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'LingArc - Learn English from A1 to C1',
-  description: 'Master English with adaptive learning.',
+  description: 'Master English with adaptive learning, from beginner to advanced.',
 };
 
 export default function RootLayout({

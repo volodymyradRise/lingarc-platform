@@ -137,4 +137,125 @@ export const CURRICULUM: Record<CEFRLevel, LevelCurriculum> = {
             type: 'grammar',
             level: 'B1',
             xp: 30,
-            storyEN: 'James has worked at TechCorp for three years. Last year, he led a major project. He has learned a lot since he joined the company. Yesterday, he presented his results to th
+            storyEN: 'James has worked at TechCorp for three years. Last year, he led a major project. He has learned a lot since he joined the company. Yesterday, he presented his results to the board.',
+            exercises: [
+              {
+                id: 'b1-u1-l1-e1',
+                type: 'multiple_choice',
+                questionEN: 'Which sentence uses Present Perfect correctly?',
+                options: [
+                  'I have seen her yesterday.',
+                  'She has lived here for five years.',
+                  'We have finished the work last week.',
+                  'He has went to Paris.'
+                ],
+                correct: 1,
+                explanations: {
+                  en: 'Present Perfect + "for" expresses duration up to now. "Yesterday" and "last week" require Past Simple.',
+                  uk: 'Present Perfect + "for" виражає тривалість до теперішнього моменту. "Yesterday" і "last week" вимагають Past Simple.',
+                  ru: 'Present Perfect + "for" выражает длительность до настоящего момента. "Yesterday" и "last week" требуют Past Simple.',
+                  es: 'Present Perfect + "for" expresa duración hasta ahora. "Yesterday" y "last week" requieren Past Simple.'
+                }
+              }
+            ],
+            vocabulary: [
+              { wordEN: 'worked', translations: { uk: 'працював', ru: 'работал', es: 'trabajó' } },
+              { wordEN: 'led', translations: { uk: 'очолював', ru: 'возглавлял', es: 'dirigió' } },
+              { wordEN: 'learned', translations: { uk: 'навчився', ru: 'научился', es: 'aprendió' } }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  B2: {
+    level: 'B2',
+    units: [
+      {
+        id: 'b2-u1',
+        titleEN: 'Society & Media',
+        icon: '📱',
+        lessons: [
+          {
+            id: 'b2-u1-l1',
+            titleEN: 'Passive Voice - Advanced Uses',
+            type: 'grammar',
+            level: 'B2',
+            xp: 40,
+            storyEN: 'The investigation has been launched by independent authorities. Several suspects are believed to have been involved. It is reported that key evidence was destroyed before investigators arrived.',
+            exercises: [
+              {
+                id: 'b2-u1-l1-e1',
+                type: 'multiple_choice',
+                questionEN: 'Transform to passive: "Scientists have discovered a new species."',
+                options: [
+                  'A new species discovered by scientists.',
+                  'A new species has been discovered by scientists.',
+                  'A new species was discovered by scientists.',
+                  'Scientists are discovered a new species.'
+                ],
+                correct: 1,
+                explanations: {
+                  en: 'Present Perfect Passive: have/has + been + past participle',
+                  uk: 'Present Perfect Passive: have/has + been + дієприкметник',
+                  ru: 'Present Perfect Passive: have/has + been + причастие',
+                  es: 'Present Perfect Passive: have/has + been + participio pasado'
+                }
+              }
+            ],
+            vocabulary: [
+              { wordEN: 'launched', translations: { uk: 'запущено', ru: 'запущено', es: 'lanzado' } },
+              { wordEN: 'suspects', translations: { uk: 'підозрювані', ru: 'подозреваемые', es: 'sospechosos' } },
+              { wordEN: 'evidence', translations: { uk: 'докази', ru: 'доказательства', es: 'evidencia' } }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  C1: {
+    level: 'C1',
+    units: [
+      {
+        id: 'c1-u1',
+        titleEN: 'Critical Thinking & Debate',
+        icon: '🎯',
+        lessons: [
+          {
+            id: 'c1-u1-l1',
+            titleEN: 'Hedging and Academic Language',
+            type: 'grammar',
+            level: 'C1',
+            xp: 50,
+            storyEN: 'In academic and professional contexts, speakers often hedge their claims to appear credible and avoid overgeneralising. Phrases like "it would appear that", "there is a tendency for", or "the evidence suggests" soften assertions and signal careful reasoning rather than dogmatic certainty.',
+            exercises: [
+              {
+                id: 'c1-u1-l1-e1',
+                type: 'multiple_choice',
+                questionEN: 'Which sentence best demonstrates academic hedging?',
+                options: [
+                  'This proves that climate change causes floods.',
+                  'The data indicates a possible correlation between deforestation and flooding.',
+                  'Everybody knows floods are getting worse.',
+                  'Floods happen because of climate change, obviously.'
+                ],
+                correct: 1,
+                explanations: {
+                  en: '"Indicates a possible correlation" hedges the claim — acknowledging uncertainty without abandoning the argument.',
+                  uk: '"Indicates a possible correlation" пом\'якшує твердження — визнаючи невизначеність без відмови від аргументу.',
+                  ru: '"Indicates a possible correlation" смягчает утверждение — признавая неопределённость без отказа от аргумента.',
+                  es: '"Indicates a possible correlation" suaviza la afirmación — reconociendo la incertidumbre sin abandonar el argumento.'
+                }
+              }
+            ],
+            vocabulary: [
+              { wordEN: 'hedge', translations: { uk: "пом'якшувати", ru: 'смягчать', es: 'suavizar' } },
+              { wordEN: 'credible', translations: { uk: 'достовірний', ru: 'достоверный', es: 'creíble' } },
+              { wordEN: 'assertion', translations: { uk: 'твердження', ru: 'утверждение', es: 'afirmación' } }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+};

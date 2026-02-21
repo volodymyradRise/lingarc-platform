@@ -7,6 +7,7 @@ export interface Exercise {
   type: 'multiple_choice' | 'fill_blank' | 'sentence_order' | 'word_match';
   questionEN: string;
   options?: string[];
+  words?: string[]; // ✅ ДОДАНО для sentence_order
   correct: number | string;
   explanations: Record<string, string>;
 }
@@ -23,7 +24,7 @@ export interface VocabularyItem {
 export interface Lesson {
   id: string;
   titleEN: string;
-  type: 'grammar' | 'vocabulary' | 'reading' | 'listening';
+  type: 'grammar' | 'vocabulary' | 'reading' | 'listening' | 'review' | 'final_test'; // ✅ ДОДАНО review і final_test
   level: CEFRLevel;
   xp: number;
   storyEN: string;

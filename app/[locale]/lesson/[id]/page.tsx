@@ -1,5 +1,17 @@
 'use client';
-
+// DEBUG - видали після тестування
+useEffect(() => {
+  if (currentExercise && currentExercise.type === 'sentence_order') {
+    console.log('🔍 SENTENCE ORDER DEBUG:', {
+      id: currentExercise.id,
+      type: currentExercise.type,
+      hasWords: !!currentExercise.words,
+      wordsCount: currentExercise.words?.length || 0,
+      words: currentExercise.words,
+      question: currentExercise.questionEN
+    });
+  }
+}, [currentExercise]);
 import { useParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { generateCurriculum } from '@/lib/curriculum/generator';

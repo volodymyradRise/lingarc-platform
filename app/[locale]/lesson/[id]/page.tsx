@@ -1,17 +1,5 @@
 'use client';
-// DEBUG - видали після тестування
-useEffect(() => {
-  if (currentExercise && currentExercise.type === 'sentence_order') {
-    console.log('🔍 SENTENCE ORDER DEBUG:', {
-      id: currentExercise.id,
-      type: currentExercise.type,
-      hasWords: !!currentExercise.words,
-      wordsCount: currentExercise.words?.length || 0,
-      words: currentExercise.words,
-      question: currentExercise.questionEN
-    });
-  }
-}, [currentExercise]);
+
 import { useParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { generateCurriculum } from '@/lib/curriculum/generator';
@@ -108,6 +96,7 @@ export default function LessonPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
+      {/* Header */}
       <div className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-2">
@@ -131,7 +120,9 @@ export default function LessonPage() {
         </div>
       </div>
 
+      {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 py-8">
+        {/* Story/Grammar Explanation */}
         {currentExerciseIndex === 0 && lesson.storyEN && (
           <div className="mb-8 p-6 bg-gray-800/50 rounded-lg border border-gray-700">
             <div className="prose prose-invert prose-sm max-w-none whitespace-pre-wrap">
@@ -140,11 +131,14 @@ export default function LessonPage() {
           </div>
         )}
 
+        {/* Exercise Card */}
         <div className="bg-gray-800 rounded-lg p-8 shadow-xl border border-gray-700">
+          {/* Question */}
           <div className="mb-6">
             <p className="text-2xl font-semibold mb-2">{currentExercise.questionEN}</p>
           </div>
 
+          {/* Multiple Choice */}
           {currentExercise.type === 'multiple_choice' && currentExercise.options && (
             <div className="space-y-3">
               {currentExercise.options.map((option, idx) => (
@@ -171,6 +165,7 @@ export default function LessonPage() {
             </div>
           )}
 
+          {/* Fill in the Blank */}
           {currentExercise.type === 'fill_blank' && (
             <div className="space-y-4">
               <input
@@ -204,11 +199,22 @@ export default function LessonPage() {
             </div>
           )}
 
+          {/* Sentence Order */}
           {currentExercise.type === 'sentence_order' && (
             <div className="space-y-4">
-              {currentExercise.words && currentExercise.words.length > 0 && (
-                <div className="mb-4 p-4 bg-gray-900 rounded-lg border border-gray-700">
-                  <p className="text-sm text-gray-400 mb-3">💡 Words to use:</p>
+              {/* ЧЕРВОНИЙ DEBUG БЛОК */}
+              <div className="p-4 bg-red-600 text-white rounded-lg mb-4 font-mono text-xs">
+                <p className="font-bold mb-2">🔴 DEBUG INFO:</p>
+                <p>Exercise ID: {currentExercise.id}</p>
+                <p>Has words property: {currentExercise.words ? 'YES' : 'NO'}</p>
+                <p>Words length: {currentExercise.words?.length || 'N/A'}</p>
+                <p>Words array: {JSON.stringify(currentExercise.words)}</p>
+              </div>
+
+              {/* ЗЕЛЕНИЙ/ЖОВТИЙ БЛОК */}
+              {currentExercise.words && currentExercise.words.length > 0 ? (
+                <div className="mb-4 p-4 bg-green-900 rounded-lg border border-green-700">
+                  <p className="text-sm text-green-400 mb-3">💡 Words to use:</p>
                   <div className="flex flex-wrap gap-2">
                     {currentExercise.words.map((word, idx) => (
                       <span
@@ -220,8 +226,13 @@ export default function LessonPage() {
                     ))}
                   </div>
                 </div>
+              ) : (
+                <div className="mb-4 p-4 bg-yellow-900 rounded-lg border border-yellow-700">
+                  <p className="text-yellow-400">⚠️ NO WORDS FOUND!</p>
+                </div>
               )}
 
+              {/* TEXTAREA */}
               <textarea
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
@@ -241,6 +252,8 @@ export default function LessonPage() {
                 } focus:outline-none transition-colors resize-none`}
                 placeholder="Type the complete sentence..."
               />
+              
+              {/* CHECK BUTTON */}
               {!showResult && (
                 <button
                   onClick={handleSentenceOrder}
@@ -252,6 +265,7 @@ export default function LessonPage() {
             </div>
           )}
 
+          {/* Result Feedback */}
           {showResult && (
             <div className="mt-6 space-y-4">
               <div
@@ -284,6 +298,7 @@ export default function LessonPage() {
           )}
         </div>
 
+        {/* Score */}
         <div className="mt-6 text-center text-gray-400">
           <p className="text-sm">
             Score: <span className="text-yellow-500 font-bold">{score}</span> / {currentExerciseIndex + 1}
